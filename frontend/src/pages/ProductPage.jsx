@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/client.js';
 import Loader from '../components/common/Loader.jsx';
 import { useCompare } from '../context/CompareContext.jsx';
+import { applyProductImageFallback, PRODUCT_FALLBACK_IMAGE } from '../utils/images.js';
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -49,8 +50,9 @@ export default function ProductPage() {
     <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="card overflow-hidden">
         <img
-          src={product.primary_image || 'https://placehold.co/700x700?text=ShopHub'}
+          src={product.primary_image || PRODUCT_FALLBACK_IMAGE}
           alt={product.title}
+          onError={applyProductImageFallback}
           className="h-full w-full object-cover"
         />
       </div>

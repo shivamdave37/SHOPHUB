@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../api/client.js';
 import Loader from '../components/common/Loader.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
+import { applyProductImageFallback, PRODUCT_FALLBACK_IMAGE } from '../utils/images.js';
 
 export default function CartPage() {
   const [items, setItems] = useState([]);
@@ -44,8 +45,9 @@ export default function CartPage() {
         {items.map((item) => (
           <div key={item.id} className="card flex flex-col gap-4 p-5 sm:flex-row">
             <img
-              src={item.primary_image || 'https://placehold.co/200x200?text=ShopHub'}
+              src={item.primary_image || PRODUCT_FALLBACK_IMAGE}
               alt={item.title}
+              onError={applyProductImageFallback}
               className="h-28 w-28 rounded-2xl object-cover"
             />
             <div className="flex-1">

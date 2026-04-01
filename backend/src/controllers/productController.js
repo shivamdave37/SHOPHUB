@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import { getCache, setCache } from '../utils/cache.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
   const page = Number(req.query.page || 1);
@@ -16,6 +17,15 @@ export const getProducts = asyncHandler(async (req, res) => {
   }
 
   const whereClause = `WHERE ${conditions.join(' AND ')}`;
+  const cacheKey = `products:${page}:${limit}:${categoryId || 'all'}`;
+  const cachedResponse = getCache(cacheKey);
+
+  if (cachedResponse) {
+    return res.json({
+      success: true,
+      data: cachedResponse
+    });
+  }
 
   const [products] = await pool.query(
     `SELECT
@@ -45,19 +55,32 @@ export const getProducts = asyncHandler(async (req, res) => {
     params
   );
 
+  const responseData = {
+    page,
+    limit,
+    total: countRows[0].total,
+    products
+  };
+
+  setCache(cacheKey, responseData, 45000);
+
   res.json({
     success: true,
-    data: {
-      page,
-      limit,
-      total: countRows[0].total,
-      products
-    }
+    data: responseData
   });
 });
 
 export const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const cacheKey = `product:${id}`;
+  const cachedResponse = getCache(cacheKey);
+
+  if (cachedResponse) {
+    return res.json({
+      success: true,
+      data: cachedResponse
+    });
+  }
 
   const [products] = await pool.query(
     `SELECT
@@ -83,6 +106,8 @@ export const getProductById = asyncHandler(async (req, res) => {
     error.statusCode = 404;
     throw error;
   }
+
+  setCache(cacheKey, products[0], 45000);
 
   res.json({
     success: true,
@@ -138,6 +163,15 @@ export const searchProducts = asyncHandler(async (req, res) => {
   const orderByClause = keyword
     ? 'ORDER BY relevance DESC, p.rating DESC, p.id DESC'
     : 'ORDER BY p.rating DESC, p.id DESC';
+  const cacheKey = `search:${keyword || 'all'}:${categoryId || 'all'}:${minPrice ?? 'min'}:${maxPrice ?? 'max'}:${minRating ?? 'rating'}:${page}:${limit}`;
+  const cachedResponse = getCache(cacheKey);
+
+  if (cachedResponse) {
+    return res.json({
+      success: true,
+      data: cachedResponse
+    });
+  }
 
   const [products] = await pool.query(
     `SELECT
@@ -168,14 +202,18 @@ export const searchProducts = asyncHandler(async (req, res) => {
     params
   );
 
+  const responseData = {
+    products,
+    total: countRows[0].total,
+    page,
+    limit,
+    totalPages: Math.ceil(countRows[0].total / limit)
+  };
+
+  setCache(cacheKey, responseData, 30000);
+
   res.json({
     success: true,
-    data: {
-      products,
-      total: countRows[0].total,
-      page,
-      limit,
-      totalPages: Math.ceil(countRows[0].total / limit)
-    }
+    data: responseData
   });
 });

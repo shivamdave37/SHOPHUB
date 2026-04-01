@@ -1,5 +1,6 @@
 import EmptyState from '../components/common/EmptyState.jsx';
 import { useCompare } from '../context/CompareContext.jsx';
+import { applyProductImageFallback, PRODUCT_FALLBACK_IMAGE } from '../utils/images.js';
 
 export default function ComparePage() {
   const { compareItems, removeCompareItem, clearCompare } = useCompare();
@@ -29,8 +30,9 @@ export default function ComparePage() {
         {compareItems.map((product) => (
           <div key={product.id} className="card overflow-hidden">
             <img
-              src={product.primary_image || 'https://placehold.co/500x300?text=ShopHub'}
+              src={product.primary_image || PRODUCT_FALLBACK_IMAGE}
               alt={product.title}
+              onError={applyProductImageFallback}
               className="h-52 w-full object-cover"
             />
             <div className="space-y-3 p-5">

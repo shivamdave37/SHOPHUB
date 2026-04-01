@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useCompare } from '../../context/CompareContext.jsx';
+import { applyProductImageFallback, PRODUCT_FALLBACK_IMAGE } from '../../utils/images.js';
 
 export default function ProductCard({ product }) {
   const [error, setError] = useState('');
@@ -26,8 +27,9 @@ export default function ProductCard({ product }) {
     >
       <div className="aspect-square bg-slate-100">
         <img
-          src={product.primary_image || 'https://placehold.co/400x400?text=ShopHub'}
+          src={product.primary_image || PRODUCT_FALLBACK_IMAGE}
           alt={product.title}
+          onError={applyProductImageFallback}
           className="h-full w-full object-cover"
         />
       </div>
