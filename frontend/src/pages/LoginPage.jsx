@@ -18,7 +18,7 @@ export default function LoginPage() {
       login(data.data);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Login failed. Please check your email, password, or backend deployment.');
     }
   };
 

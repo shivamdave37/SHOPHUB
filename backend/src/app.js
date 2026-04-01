@@ -10,13 +10,30 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 const app = express();
 
-const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+const allowedOrigins = new Set([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  process.env.FRONTEND_URL
+].filter(Boolean));
 
 app.use(
   cors({
-    origin: allowedOrigin
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.has(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
+app.options('*', cors());
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {

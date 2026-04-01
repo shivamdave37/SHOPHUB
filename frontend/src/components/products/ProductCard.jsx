@@ -1,6 +1,24 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useCompare } from '../../context/CompareContext.jsx';
 
 export default function ProductCard({ product }) {
+  const [error, setError] = useState('');
+  const { compareItems, toggleCompare } = useCompare();
+  const isInCompare = compareItems.some((item) => item.id === product.id);
+
+  const handleCompare = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setError('');
+
+    try {
+      toggleCompare(product);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <Link
       to={`/products/${product.id}`}
@@ -25,6 +43,13 @@ export default function ProductCard({ product }) {
           <span className="text-xl font-bold text-slate-900">Rs. {product.price}</span>
           <span className="text-sm text-slate-500">{product.stock} left</span>
         </div>
+        <button
+          onClick={handleCompare}
+          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
+        >
+          {isInCompare ? 'Remove from Compare' : 'Add to Compare'}
+        </button>
+        {error && <p className="text-xs text-red-600">{error}</p>}
       </div>
     </Link>
   );

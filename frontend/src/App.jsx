@@ -10,6 +10,7 @@ import OrdersPage from './pages/OrdersPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import AdminProductsPage from './pages/AdminProductsPage.jsx';
+import ComparePage from './pages/ComparePage.jsx';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/products/:id" element={<ProductPage />} />
         <Route path="/search" element={<SearchResultsPage />} />
+        <Route path="/compare" element={<ComparePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route

@@ -1,11 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useCompare } from '../../context/CompareContext.jsx';
 
 export default function Header() {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { compareItems } = useCompare();
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -48,6 +50,9 @@ export default function Header() {
                 <Link to="/cart" className="hover:text-amber-300">
                   Cart
                 </Link>
+                <Link to="/compare" className="hover:text-amber-300">
+                  Compare ({compareItems.length})
+                </Link>
                 {user.role === 'admin' && (
                   <Link to="/admin/products" className="hover:text-amber-300">
                     Admin
@@ -64,6 +69,9 @@ export default function Header() {
                 </Link>
                 <Link to="/register" className="hover:text-amber-300">
                   Register
+                </Link>
+                <Link to="/compare" className="hover:text-amber-300">
+                  Compare ({compareItems.length})
                 </Link>
               </>
             )}

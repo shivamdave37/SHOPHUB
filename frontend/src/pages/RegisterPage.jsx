@@ -13,6 +13,11 @@ export default function RegisterPage() {
     event.preventDefault();
     setError('');
 
+    if (form.password.trim().length < 6) {
+      setError('Password must be at least 6 digits or characters long');
+      return;
+    }
+
     try {
       const { data } = await api.post('/auth/register', form);
       login(data.data);
@@ -46,6 +51,7 @@ export default function RegisterPage() {
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
+        <p className="-mt-2 text-xs text-slate-500">Password must be at least 6 digits or characters long.</p>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button className="btn-primary w-full" type="submit">
           Register
