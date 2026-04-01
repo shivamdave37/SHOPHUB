@@ -65,11 +65,11 @@ const PRODUCT_IMAGES = {
   'ChefEase Non Stick Fry Pan':
     'https://images.unsplash.com/photo-1583778176476-4a8b02f6f4c6?auto=format&fit=crop&w=900&q=80',
   'PureSip Stainless Steel Bottle 1L':
-    'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=900&q=80',
   'GlowNest LED Table Lamp':
     'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80',
   'SoftCloud Microfiber Pillow Set':
-    'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=900&q=80',
   'FreshFold Laundry Basket':
     'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=900&q=80',
   'AromaBrew French Press':
@@ -77,11 +77,11 @@ const PRODUCT_IMAGES = {
   'NeatStack Storage Box Set':
     'https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?auto=format&fit=crop&w=900&q=80',
   'CozyWeave Floor Rug':
-    'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
   'BrightWash Cotton Bath Towel Set':
-    'https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1616628182509-6c6cb74c0f89?auto=format&fit=crop&w=900&q=80',
   'GreenLeaf Indoor Plant Pot':
-    'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=900&q=80',
   'PowerGrip Adjustable Dumbbells 10kg':
     'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80',
   'RunFlex Yoga Mat':
