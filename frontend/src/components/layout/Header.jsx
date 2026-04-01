@@ -6,7 +6,7 @@ import { useCompare } from '../../context/CompareContext.jsx';
 export default function Header() {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { compareItems } = useCompare();
 
   const handleSearch = (event) => {
@@ -41,39 +41,19 @@ export default function Header() {
           </form>
 
           <div className="flex items-center gap-4 text-sm">
-            {user ? (
-              <>
-                <span className="hidden sm:inline">Hi, {user.name}</span>
-                <Link to="/orders" className="hover:text-amber-300">
-                  Orders
-                </Link>
-                <Link to="/cart" className="hover:text-amber-300">
-                  Cart
-                </Link>
-                <Link to="/compare" className="hover:text-amber-300">
-                  Compare ({compareItems.length})
-                </Link>
-                {user.role === 'admin' && (
-                  <Link to="/admin/products" className="hover:text-amber-300">
-                    Admin
-                  </Link>
-                )}
-                <button onClick={logout} className="hover:text-amber-300">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="hover:text-amber-300">
-                  Login
-                </Link>
-                <Link to="/register" className="hover:text-amber-300">
-                  Register
-                </Link>
-                <Link to="/compare" className="hover:text-amber-300">
-                  Compare ({compareItems.length})
-                </Link>
-              </>
+            <Link to="/cart" className="hover:text-amber-300">
+              Cart
+            </Link>
+            <Link to="/orders" className="hover:text-amber-300">
+              Orders
+            </Link>
+            <Link to="/compare" className="hover:text-amber-300">
+              Compare ({compareItems.length})
+            </Link>
+            {user?.role === 'admin' && (
+              <Link to="/admin/products" className="hover:text-amber-300">
+                Admin
+              </Link>
             )}
           </div>
         </div>
