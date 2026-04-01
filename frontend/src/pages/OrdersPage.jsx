@@ -1,26 +1,8 @@
-import { useEffect, useState } from 'react';
-import api from '../api/client.js';
-import Loader from '../components/common/Loader.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
+import { useDemoStore } from '../context/DemoStoreContext.jsx';
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const { data } = await api.get('/orders');
-        setOrders(data.data);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, []);
-
-  if (loading) return <Loader text="Loading orders..." />;
+  const { orders } = useDemoStore();
   if (!orders.length) return <EmptyState title="No orders yet" description="Placed orders will appear here." />;
 
   return (
@@ -43,6 +25,10 @@ export default function OrdersPage() {
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-500">Total</p>
             <p className="font-semibold">Rs. {order.total_amount}</p>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Payment</p>
+            <p className="font-semibold uppercase">{order.payment_method}</p>
           </div>
         </div>
       ))}

@@ -5,14 +5,17 @@ import App from './App.jsx';
 import './index.css';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { CompareProvider } from './context/CompareContext.jsx';
+import { DemoStoreProvider } from './context/DemoStoreContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <CompareProvider>
-          <App />
-        </CompareProvider>
+        <DemoStoreProvider>
+          <CompareProvider>
+            <App />
+          </CompareProvider>
+        </DemoStoreProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

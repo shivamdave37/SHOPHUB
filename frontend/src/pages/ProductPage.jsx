@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/client.js';
 import Loader from '../components/common/Loader.jsx';
 import { useCompare } from '../context/CompareContext.jsx';
-import { applyProductImageFallback, PRODUCT_FALLBACK_IMAGE } from '../utils/images.js';
+import { useDemoStore } from '../context/DemoStoreContext.jsx';
+import { applyProductImageFallback, getProductImage } from '../utils/images.js';
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { compareItems, toggleCompare } = useCompare();
+  const { addToCart } = useDemoStore();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,8 +28,8 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
-  const addToCart = async () => {
-    await api.post('/cart', { productId: product.id, quantity: 1 });
+  const handleAddToCart = () => {
+    addToCart(product, 1);
     navigate('/cart');
   };
 
@@ -50,7 +52,7 @@ export default function ProductPage() {
     <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="card overflow-hidden">
         <img
-          src={product.primary_image || PRODUCT_FALLBACK_IMAGE}
+          src={getProductImage(product)}
           alt={product.title}
           onError={applyProductImageFallback}
           className="h-full w-full object-cover"
@@ -67,7 +69,7 @@ export default function ProductPage() {
         <p className="text-3xl font-bold text-slate-900">Rs. {product.price}</p>
         <p className="text-sm text-slate-500">Only {product.stock} units available</p>
         <div className="space-y-3">
-          <button onClick={addToCart} className="btn-primary w-full">
+          <button onClick={handleAddToCart} className="btn-primary w-full">
             Add to Cart
           </button>
           <button onClick={handleCompare} className="w-full rounded-xl border border-slate-300 px-4 py-2 font-medium text-slate-700">

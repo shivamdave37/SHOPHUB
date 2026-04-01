@@ -2,12 +2,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useCompare } from '../../context/CompareContext.jsx';
+import { useDemoStore } from '../../context/DemoStoreContext.jsx';
 
 export default function Header() {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const { user } = useAuth();
   const { compareItems } = useCompare();
+  const { cartCount } = useDemoStore();
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -42,7 +44,7 @@ export default function Header() {
 
           <div className="flex items-center gap-4 text-sm">
             <Link to="/cart" className="hover:text-amber-300">
-              Cart
+              Cart ({cartCount})
             </Link>
             <Link to="/orders" className="hover:text-amber-300">
               Orders
