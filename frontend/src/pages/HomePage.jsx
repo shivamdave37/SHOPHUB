@@ -3,6 +3,7 @@ import api from '../api/client.js';
 import Loader from '../components/common/Loader.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import ProductGrid from '../components/products/ProductGrid.jsx';
+import ProjectDocumentation from '../components/project/ProjectDocumentation.jsx';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -43,6 +44,8 @@ export default function HomePage() {
         </div>
         <ProductGrid products={products} />
       </section>
+
+      <ProjectDocumentation />
     </div>
   );
 }
