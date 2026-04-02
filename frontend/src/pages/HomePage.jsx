@@ -29,7 +29,7 @@ export default function HomePage() {
       <section className="overflow-hidden rounded-3xl bg-gradient-to-r from-brand-navy via-brand-accent to-slate-700 p-8 text-white">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
         <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight">
-          Simple Amazon-inspired ecommerce demo built for a DBMS project
+          “Smart shopping starts with strong data.”
         </h1>
         <p className="mt-3 max-w-2xl text-slate-200">
           Explore products, search with filters, add to cart, place orders, and manage catalog data.
