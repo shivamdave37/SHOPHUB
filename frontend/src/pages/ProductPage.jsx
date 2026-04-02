@@ -10,6 +10,8 @@ export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [guide, setGuide] = useState(null);
+  const [guideLoading, setGuideLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { compareItems, toggleCompare } = useCompare();
@@ -40,6 +42,20 @@ export default function ProductPage() {
       toggleCompare(product);
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleAskGuide = async () => {
+    setError('');
+    setGuideLoading(true);
+
+    try {
+      const { data } = await api.get(`/products/${id}/guide`);
+      setGuide(data.data);
+    } catch {
+      setError('Unable to load AI guidance right now.');
+    } finally {
+      setGuideLoading(false);
     }
   };
 
@@ -75,8 +91,70 @@ export default function ProductPage() {
           <button onClick={handleCompare} className="w-full rounded-xl border border-slate-300 px-4 py-2 font-medium text-slate-700">
             {isInCompare ? 'Remove from Compare' : 'Add to Compare'}
           </button>
+          <button
+            onClick={handleAskGuide}
+            disabled={guideLoading}
+            className="w-full rounded-xl bg-brand-accent px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {guideLoading ? 'Generating AI Guide...' : 'Ask AI About This Product'}
+          </button>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
+
+        {guide && (
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-accent">AI Product Helper</p>
+              <h2 className="mt-2 text-xl font-bold text-slate-900">Usage and Practical Guidance</h2>
+            </div>
+
+            <div className="space-y-3 text-sm text-slate-700">
+              <div>
+                <p className="font-semibold text-slate-900">What it is</p>
+                <p>{guide.summary}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Usage</p>
+                <p>{guide.usage}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Practical applications</p>
+                <ul className="space-y-2">
+                  {guide.practicalApplications.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-1.5 h-2 w-2 rounded-full bg-amber-400" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Best for</p>
+                <p>{guide.bestFor}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Buying advice</p>
+                <p>{guide.buyingAdvice}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Quick considerations</p>
+                <ul className="space-y-2">
+                  {guide.considerations.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-1.5 h-2 w-2 rounded-full bg-slate-400" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
