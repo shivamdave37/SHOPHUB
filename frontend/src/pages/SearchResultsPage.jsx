@@ -18,7 +18,8 @@ export default function SearchResultsPage() {
       categoryId: params.get('categoryId') || '',
       minPrice: params.get('minPrice') || '',
       maxPrice: params.get('maxPrice') || '',
-      minRating: params.get('minRating') || ''
+      minRating: params.get('minRating') || '',
+      sort: params.get('sort') || ''
     }),
     [params]
   );
@@ -65,14 +66,33 @@ export default function SearchResultsPage() {
     setParams(next);
   };
 
+  const handleClear = () => {
+    setDraft({
+      keyword: '',
+      categoryId: '',
+      minPrice: '',
+      maxPrice: '',
+      minRating: '',
+      sort: ''
+    });
+    setParams({});
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Search Results</h1>
-        <p className="mt-1 text-slate-600">Filter by keyword, category, price, and rating.</p>
+        <p className="mt-1 text-slate-600">
+          Search by product name and refine results using easy shopping filters.
+        </p>
       </div>
 
-      <SearchFilters filters={draft} onChange={handleChange} onSubmit={handleSubmit} />
+      <SearchFilters
+        filters={draft}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        onClear={handleClear}
+      />
 
       {loading ? (
         <Loader text="Searching products..." />

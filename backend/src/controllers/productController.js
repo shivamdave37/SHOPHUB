@@ -244,6 +244,7 @@ export const searchProducts = asyncHandler(async (req, res) => {
   const minPrice = req.query.minPrice ? Number(req.query.minPrice) : null;
   const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : null;
   const minRating = req.query.minRating ? Number(req.query.minRating) : null;
+  const sort = (req.query.sort || '').trim();
   const page = Math.max(Number(req.query.page || 1), 1);
   const limit = Math.min(Math.max(Number(req.query.limit || 12), 1), 50);
   const offset = (page - 1) * limit;
@@ -283,10 +284,21 @@ export const searchProducts = asyncHandler(async (req, res) => {
   }
 
   const whereClause = `WHERE ${conditions.join(' AND ')}`;
-  const orderByClause = keyword
+  let orderByClause = keyword
     ? 'ORDER BY relevance DESC, p.rating DESC, p.id DESC'
     : 'ORDER BY p.rating DESC, p.id DESC';
-  const cacheKey = `search:${keyword || 'all'}:${categoryId || 'all'}:${minPrice ?? 'min'}:${maxPrice ?? 'max'}:${minRating ?? 'rating'}:${page}:${limit}`;
+
+  if (sort === 'price_asc') {
+    orderByClause = 'ORDER BY p.price ASC, p.id ASC';
+  } else if (sort === 'price_desc') {
+    orderByClause = 'ORDER BY p.price DESC, p.id DESC';
+  } else if (sort === 'rating_desc') {
+    orderByClause = 'ORDER BY p.rating DESC, p.id DESC';
+  } else if (sort === 'newest') {
+    orderByClause = 'ORDER BY p.created_at DESC, p.id DESC';
+  }
+
+  const cacheKey = `search:${keyword || 'all'}:${categoryId || 'all'}:${minPrice ?? 'min'}:${maxPrice ?? 'max'}:${minRating ?? 'rating'}:${sort || 'default'}:${page}:${limit}`;
   const cachedResponse = getCache(cacheKey);
 
   if (cachedResponse) {
@@ -330,7 +342,8 @@ export const searchProducts = asyncHandler(async (req, res) => {
     total: countRows[0].total,
     page,
     limit,
-    totalPages: Math.ceil(countRows[0].total / limit)
+    totalPages: Math.ceil(countRows[0].total / limit),
+    sort
   };
 
   setCache(cacheKey, responseData, 30000);
