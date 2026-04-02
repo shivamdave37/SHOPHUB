@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import EmptyState from '../components/common/EmptyState.jsx';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDemoStore } from '../context/DemoStoreContext.jsx';
 import { applyProductImageFallback, getProductImage } from '../utils/images.js';
 
@@ -22,7 +22,18 @@ export default function CartPage() {
     navigate('/orders');
   };
 
-  if (!cartItems.length) return <EmptyState title="Your cart is empty" description="Add a few products to continue." />;
+  if (!cartItems.length) {
+    return (
+      <EmptyState
+        title="Your cart feels lonely"
+        description="Browse products to add items and build your perfect shopping list."
+      >
+        <Link to="/" className="btn-primary inline-flex items-center justify-center">
+          Continue Shopping
+        </Link>
+      </EmptyState>
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">

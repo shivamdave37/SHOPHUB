@@ -4,10 +4,12 @@ const DemoStoreContext = createContext(null);
 
 const CART_KEY = 'shophub_demo_cart';
 const ORDERS_KEY = 'shophub_demo_orders';
+const RECENTLY_VIEWED_KEY = 'shophub_recently_viewed';
 
 export function DemoStoreProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     const storedCart = localStorage.getItem(CART_KEY);
@@ -20,6 +22,12 @@ export function DemoStoreProvider({ children }) {
     if (storedOrders) {
       setOrders(JSON.parse(storedOrders));
     }
+
+    const storedRecentlyViewed = localStorage.getItem(RECENTLY_VIEWED_KEY);
+
+    if (storedRecentlyViewed) {
+      setRecentlyViewed(JSON.parse(storedRecentlyViewed));
+    }
   }, []);
 
   const persistCart = (items) => {
@@ -30,6 +38,11 @@ export function DemoStoreProvider({ children }) {
   const persistOrders = (items) => {
     setOrders(items);
     localStorage.setItem(ORDERS_KEY, JSON.stringify(items));
+  };
+
+  const persistRecentlyViewed = (items) => {
+    setRecentlyViewed(items);
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(items));
   };
 
   const addToCart = (product, quantity = 1) => {
@@ -99,13 +112,26 @@ export function DemoStoreProvider({ children }) {
     [cartItems]
   );
 
+  const addRecentlyViewed = (product) => {
+    if (!product?.id) return;
+
+    const nextItems = [
+      product,
+      ...recentlyViewed.filter((item) => item.id !== product.id)
+    ].slice(0, 6);
+
+    persistRecentlyViewed(nextItems);
+  };
+
   return (
     <DemoStoreContext.Provider
       value={{
         cartItems,
         orders,
+        recentlyViewed,
         cartCount,
         addToCart,
+        addRecentlyViewed,
         removeCartItem,
         clearCart,
         placeOrder

@@ -258,9 +258,17 @@ export const searchProducts = asyncHandler(async (req, res) => {
       'MATCH(p.title, p.description, p.search_vector) AGAINST(? IN NATURAL LANGUAGE MODE) AS relevance';
     params.push(keyword);
     conditions.push(
-      'MATCH(p.title, p.description, p.search_vector) AGAINST(? IN NATURAL LANGUAGE MODE)'
+      `(
+        MATCH(p.title, p.description, p.search_vector) AGAINST(? IN NATURAL LANGUAGE MODE)
+        OR p.title LIKE ?
+        OR COALESCE(p.description, '') LIKE ?
+        OR p.search_vector LIKE ?
+      )`
     );
     params.push(keyword);
+    params.push(`%${keyword}%`);
+    params.push(`%${keyword}%`);
+    params.push(`%${keyword}%`);
   }
 
   if (categoryId) {

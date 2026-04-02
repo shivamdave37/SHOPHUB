@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/client.js';
-import Loader from '../components/common/Loader.jsx';
 import { useCompare } from '../context/CompareContext.jsx';
 import { useDemoStore } from '../context/DemoStoreContext.jsx';
 import { applyProductImageFallback, getProductImage } from '../utils/images.js';
+import { badgeClassName, getProductBadges } from '../utils/productMeta.js';
+import ProductGrid from '../components/products/ProductGrid.jsx';
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -15,7 +16,7 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { compareItems, toggleCompare } = useCompare();
-  const { addToCart } = useDemoStore();
+  const { addToCart, addRecentlyViewed, recentlyViewed } = useDemoStore();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,6 +30,13 @@ export default function ProductPage() {
 
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (product) {
+      addRecentlyViewed(product);
+    }
+    // Intentionally keyed to product id so recently-viewed writes happen once per product view.
+  }, [product?.id]);
 
   const handleAddToCart = () => {
     addToCart(product, 1);
@@ -59,46 +67,84 @@ export default function ProductPage() {
     }
   };
 
-  if (loading) return <Loader text="Loading product..." />;
+  if (loading) {
+    return (
+      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="card aspect-square animate-pulse bg-slate-200" />
+        <div className="card space-y-4 p-6">
+          <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
+          <div className="h-10 w-full animate-pulse rounded bg-slate-200" />
+          <div className="h-5 w-4/5 animate-pulse rounded bg-slate-200" />
+          <div className="h-5 w-3/5 animate-pulse rounded bg-slate-200" />
+          <div className="h-8 w-40 animate-pulse rounded bg-slate-200" />
+          <div className="h-11 w-full animate-pulse rounded-xl bg-slate-200" />
+          <div className="h-11 w-full animate-pulse rounded-xl bg-slate-200" />
+          <div className="h-11 w-full animate-pulse rounded-xl bg-slate-200" />
+        </div>
+      </div>
+    );
+  }
   if (!product) return <div className="card p-8">Product not found.</div>;
 
   const isInCompare = compareItems.some((item) => item.id === product.id);
+  const badges = getProductBadges(product);
+  const relatedRecentlyViewed = recentlyViewed.filter((item) => item.id !== product.id);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="card overflow-hidden">
-        <img
-          src={getProductImage(product)}
-          alt={product.title}
-          onError={applyProductImageFallback}
-          className="h-full w-full object-cover"
-        />
-      </div>
+    <div className="space-y-10">
+      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="card overflow-hidden">
+          <div className="relative">
+            <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-2">
+              {badges.map((badge) => (
+                <span
+                  key={badge.label}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ${badgeClassName(badge.tone)}`}
+                >
+                  {badge.label}
+                </span>
+              ))}
+            </div>
+            <img
+              src={getProductImage(product)}
+              alt={product.title}
+              onError={applyProductImageFallback}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
 
-      <div className="card space-y-5 p-6">
-        <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-          {product.category_name}
-        </p>
-        <h1 className="text-3xl font-bold text-slate-900">{product.title}</h1>
-        <p className="text-slate-600">{product.description}</p>
-        <p className="text-lg text-slate-700">Rating: {product.rating}</p>
-        <p className="text-3xl font-bold text-slate-900">Rs. {product.price}</p>
-        <p className="text-sm text-slate-500">Only {product.stock} units available</p>
-        <div className="space-y-3">
-          <button onClick={handleAddToCart} className="btn-primary w-full">
-            Add to Cart
-          </button>
-          <button onClick={handleCompare} className="w-full rounded-xl border border-slate-300 px-4 py-2 font-medium text-slate-700">
-            {isInCompare ? 'Remove from Compare' : 'Add to Compare'}
-          </button>
-          <button
-            onClick={handleAskGuide}
-            disabled={guideLoading}
-            className="w-full rounded-xl bg-brand-accent px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {guideLoading ? 'Generating AI Guide...' : 'Ask AI About This Product'}
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="card space-y-5 p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            {product.category_name}
+          </p>
+          <h1 className="text-3xl font-bold text-slate-900">{product.title}</h1>
+          <p className="text-slate-600">{product.description}</p>
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <span className="rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-700">
+              Rating {product.rating}
+            </span>
+            <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-700">
+              {product.stock} units available
+            </span>
+          </div>
+          <p className="text-3xl font-bold text-slate-900">Rs. {product.price}</p>
+          <div className="space-y-3">
+            <button onClick={handleAddToCart} className="btn-primary w-full">
+              Add to Cart
+            </button>
+            <button onClick={handleCompare} className="w-full rounded-xl border border-slate-300 px-4 py-2 font-medium text-slate-700">
+              {isInCompare ? 'Remove from Compare' : 'Add to Compare'}
+            </button>
+            <button
+              onClick={handleAskGuide}
+              disabled={guideLoading}
+              className="w-full rounded-xl bg-brand-accent px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {guideLoading ? 'Generating AI Guide...' : 'Ask AI About This Product'}
+            </button>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </div>
         </div>
 
         {guide && (
@@ -156,6 +202,16 @@ export default function ProductPage() {
           </div>
         )}
       </div>
+
+      {relatedRecentlyViewed.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-slate-900">Recently Viewed</h2>
+            <p className="text-sm text-slate-500">Quickly jump back to products you explored</p>
+          </div>
+          <ProductGrid products={relatedRecentlyViewed} />
+        </section>
+      )}
     </div>
   );
 }

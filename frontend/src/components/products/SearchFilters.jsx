@@ -33,10 +33,12 @@ const sortOptions = [
 const baseChipClass =
   'rounded-full border px-3 py-2 text-sm font-medium transition';
 
-export default function SearchFilters({ filters, onChange, onSubmit, onClear }) {
+export default function SearchFilters({ filters, onChange, onQuickChange, onSubmit, onClear }) {
   const handlePriceRangeSelect = (range) => {
-    onChange('minPrice', range.minPrice);
-    onChange('maxPrice', range.maxPrice);
+    onQuickChange({
+      minPrice: range.minPrice,
+      maxPrice: range.maxPrice
+    });
   };
 
   const isActivePriceRange = (range) =>
@@ -63,7 +65,7 @@ export default function SearchFilters({ filters, onChange, onSubmit, onClear }) 
               <button
                 key={category.id || 'all'}
                 type="button"
-                onClick={() => onChange('categoryId', category.id)}
+                onClick={() => onQuickChange({ categoryId: category.id })}
                 className={`${baseChipClass} ${
                   filters.categoryId === category.id
                     ? 'border-brand-accent bg-brand-accent text-white'
@@ -103,7 +105,7 @@ export default function SearchFilters({ filters, onChange, onSubmit, onClear }) 
               <button
                 key={option.value || 'all'}
                 type="button"
-                onClick={() => onChange('minRating', option.value)}
+                onClick={() => onQuickChange({ minRating: option.value })}
                 className={`rounded-xl border px-3 py-2 text-left text-sm ${
                   filters.minRating === option.value
                     ? 'border-brand-accent bg-brand-accent/10 text-brand-accent'
@@ -129,7 +131,7 @@ export default function SearchFilters({ filters, onChange, onSubmit, onClear }) 
           <select
             className="input"
             value={filters.sort}
-            onChange={(event) => onChange('sort', event.target.value)}
+            onChange={(event) => onQuickChange({ sort: event.target.value })}
           >
             {sortOptions.map((option) => (
               <option key={option.value || 'default'} value={option.value}>

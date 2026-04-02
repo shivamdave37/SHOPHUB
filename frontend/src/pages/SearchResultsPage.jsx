@@ -4,6 +4,7 @@ import api from '../api/client.js';
 import Loader from '../components/common/Loader.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import ProductGrid from '../components/products/ProductGrid.jsx';
+import ProductSkeletonGrid from '../components/products/ProductSkeletonGrid.jsx';
 import SearchFilters from '../components/products/SearchFilters.jsx';
 
 export default function SearchResultsPage() {
@@ -55,6 +56,18 @@ export default function SearchResultsPage() {
     setDraft((current) => ({ ...current, [field]: value }));
   };
 
+  const handleQuickChange = (changes) => {
+    const next = { ...draft, ...changes };
+    setDraft(next);
+
+    const nextParams = {};
+    Object.entries(next).forEach(([key, value]) => {
+      if (value) nextParams[key] = value;
+    });
+
+    setParams(nextParams);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const next = {};
@@ -90,12 +103,16 @@ export default function SearchResultsPage() {
       <SearchFilters
         filters={draft}
         onChange={handleChange}
+        onQuickChange={handleQuickChange}
         onSubmit={handleSubmit}
         onClear={handleClear}
       />
 
       {loading ? (
-        <Loader text="Searching products..." />
+        <div className="space-y-4">
+          <Loader text="Searching products..." />
+          <ProductSkeletonGrid count={8} />
+        </div>
       ) : products.length ? (
         <div className="space-y-4">
           <div className="text-sm text-slate-500">
