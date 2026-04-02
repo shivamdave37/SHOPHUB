@@ -39,6 +39,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
   }
 
   try {
+    await connection.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
     await connection.beginTransaction();
 
     const [carts] = await connection.query('SELECT id FROM cart WHERE user_id = ? FOR UPDATE', [
@@ -100,6 +101,23 @@ export const placeOrder = asyncHandler(async (req, res) => {
       subtotal += Number(item.price) * requestedQty;
     }
 
+    for (const item of cartItems) {
+      const [reservationUpdate] = await connection.query(
+        `UPDATE inventory
+         SET quantity_reserved = quantity_reserved + ?,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE product_id = ?
+           AND (quantity_available - quantity_reserved) >= ?`,
+        [item.quantity, item.product_id, item.quantity]
+      );
+
+      if (!reservationUpdate.affectedRows) {
+        const error = new Error(`Unable to reserve stock for product: ${item.title}`);
+        error.statusCode = 409;
+        throw error;
+      }
+    }
+
     const shippingFee = subtotal >= 1000 ? 0 : 99;
     const totalAmount = subtotal + shippingFee;
     const orderNumber = generateOrderNumber();
@@ -124,10 +142,12 @@ export const placeOrder = asyncHandler(async (req, res) => {
       const [inventoryUpdate] = await connection.query(
         `UPDATE inventory
          SET quantity_available = quantity_available - ?,
+             quantity_reserved = quantity_reserved - ?,
              updated_at = CURRENT_TIMESTAMP
          WHERE product_id = ?
-           AND quantity_available >= ?`,
-        [item.quantity, item.product_id, item.quantity]
+           AND quantity_available >= ?
+           AND quantity_reserved >= ?`,
+        [item.quantity, item.quantity, item.product_id, item.quantity, item.quantity]
       );
 
       if (!inventoryUpdate.affectedRows) {
@@ -161,6 +181,12 @@ export const placeOrder = asyncHandler(async (req, res) => {
     await connection.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
 
     await connection.commit();
+
+    try {
+      await pool.query('CALL refresh_category_sales_summary()');
+    } catch {
+      // Summary refresh is best-effort and must not fail the checkout response.
+    }
 
     res.status(201).json({
       success: true,

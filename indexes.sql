@@ -12,10 +12,10 @@ USE shophub;
 -- =========================================================
 -- FULLTEXT SEARCH INDEX
 -- Enables fast keyword search on product catalog.
--- Use with MATCH(title, description) AGAINST(...)
+-- Use with MATCH(title, description, search_vector) AGAINST(...)
 -- =========================================================
 ALTER TABLE products
-  ADD FULLTEXT INDEX ft_products_title_description (title, description);
+  ADD FULLTEXT INDEX ft_products_title_description_search (title, description, search_vector);
 
 -- =========================================================
 -- REQUIRED SINGLE-COLUMN INDEXES
@@ -38,6 +38,10 @@ CREATE INDEX idx_products_category_active_price
 CREATE INDEX idx_products_category_active_rating
   ON products(category_id, is_active, rating, id);
 
+-- Product listing by category with newest products first.
+CREATE INDEX idx_products_category_created
+  ON products(category_id, is_active, created_at, id);
+
 -- Order history for a user, newest first.
 CREATE INDEX idx_orders_user_placed_at
   ON orders(user_id, placed_at, id);
@@ -58,9 +62,21 @@ CREATE INDEX idx_reviews_product_rating_created
 CREATE INDEX idx_inventory_product_available
   ON inventory(product_id, quantity_available, quantity_reserved);
 
+-- Inventory admin views for low-stock and restocking checks.
+CREATE INDEX idx_inventory_restock_monitor
+  ON inventory(quantity_available, quantity_reserved, last_restocked_at);
+
 -- Cart item lookup when loading a user's cart.
 CREATE INDEX idx_cart_items_cart_product
   ON cart_items(cart_id, product_id);
+
+-- Fake payment tracking and admin payment lookups.
+CREATE INDEX idx_payments_status_paid_at
+  ON payments(payment_status, paid_at, id);
+
+-- Pre-computed sales summary access by category or top revenue.
+CREATE INDEX idx_category_sales_summary_revenue
+  ON category_sales_summary(total_revenue, total_units);
 
 -- =========================================================
 -- QUERY OPTIMIZATION NOTES
@@ -85,6 +101,9 @@ CREATE INDEX idx_cart_items_cart_product
 
 -- 6. Avoid wrapping indexed columns in functions in WHERE clauses because
 --    it can prevent index usage.
+
+-- 7. ShopHub uses a summary table (category_sales_summary) to emulate
+--    materialized reporting in a MySQL-friendly way for dashboard reads.
 
 -- =========================================================
 -- PAGINATION QUERY EXAMPLES

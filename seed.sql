@@ -259,3 +259,5 @@ INSERT INTO reviews (id, user_id, product_id, rating, comment, created_at, updat
 (8, 9, 44, 5, 'Comfortable straps and enough compartments for a weekend trek.', '2026-04-01 08:10:00', '2026-04-01 08:10:00'),
 (9, 10, 18, 4, 'Comfortable stretch and fits well for daily wear and yoga.', '2026-03-30 14:25:00', '2026-03-30 14:25:00'),
 (10, 11, 32, 5, 'Keeps water cold for hours and feels sturdy enough for travel.', '2026-03-29 07:45:00', '2026-03-29 07:45:00');
+
+CALL refresh_category_sales_summary();

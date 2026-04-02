@@ -7,6 +7,26 @@ import {
   normalizeText
 } from '../utils/validation.js';
 
+export const getCategorySalesSummary = asyncHandler(async (_req, res) => {
+  const [rows] = await pool.query(
+    `SELECT
+      category_id,
+      category_name,
+      total_orders,
+      total_units,
+      total_revenue,
+      last_order_at,
+      refreshed_at
+    FROM category_sales_summary
+    ORDER BY total_revenue DESC, total_units DESC, category_name ASC`
+  );
+
+  res.json({
+    success: true,
+    data: rows
+  });
+});
+
 export const createProduct = asyncHandler(async (req, res) => {
   const categoryId = Number(req.body.category_id);
   const title = normalizeText(req.body.title);
@@ -36,16 +56,15 @@ export const createProduct = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  const searchVector = `${title} ${description}`.trim();
   const connection = await pool.getConnection();
 
   try {
     await connection.beginTransaction();
 
     const [result] = await connection.query(
-      `INSERT INTO products (category_id, title, description, price, stock, rating, search_vector, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, TRUE)`,
-      [categoryId, title, description || null, Number(price), Number(stock), Number(rating), searchVector]
+      `INSERT INTO products (category_id, title, description, price, stock, rating, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, TRUE)`,
+      [categoryId, title, description || null, Number(price), Number(stock), Number(rating)]
     );
 
     await connection.query(
@@ -131,8 +150,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   const normalizedTitle = title !== undefined ? normalizeText(title) : null;
   const normalizedDescription = description !== undefined ? normalizeText(description) : null;
-  const searchVector = `${normalizedTitle || ''} ${normalizedDescription || ''}`.trim();
-
   await pool.query(
     `UPDATE products
      SET category_id = COALESCE(?, category_id),
@@ -141,10 +158,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
          price = COALESCE(?, price),
          stock = COALESCE(?, stock),
          rating = COALESCE(?, rating),
-         search_vector = CASE
-           WHEN ? <> '' THEN ?
-           ELSE search_vector
-         END,
          is_active = COALESCE(?, is_active),
          updated_at = CURRENT_TIMESTAMP
      WHERE id = ?`,
@@ -155,8 +168,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
       price !== undefined ? Number(price) : null,
       stock !== undefined ? Number(stock) : null,
       rating !== undefined ? Number(rating) : null,
-      searchVector,
-      searchVector,
       is_active ?? null,
       id
     ]

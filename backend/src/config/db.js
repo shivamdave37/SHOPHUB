@@ -9,6 +9,10 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'shophub',
   waitForConnections: true,
   connectionLimit: 10,
+  maxIdle: 10,
+  idleTimeout: 60000,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
   queueLimit: 0
 });
 
