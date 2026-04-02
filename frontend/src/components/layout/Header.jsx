@@ -24,9 +24,6 @@ export default function Header() {
             <Link to="/" className="text-2xl font-bold tracking-tight text-amber-300">
               ShopHub
             </Link>
-            <span className="hidden text-sm text-slate-300 md:inline">
-              College DBMS project store demo
-            </span>
           </div>
 
           <form onSubmit={handleSearch} className="flex flex-1 gap-2 lg:max-w-2xl">
