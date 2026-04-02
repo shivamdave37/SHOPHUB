@@ -12,6 +12,8 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+UPDATE users SET public_id = UUID() WHERE public_id = '';
+
 SET @sql = IF(
   (SELECT COUNT(*) FROM information_schema.statistics
    WHERE table_schema = @db_name AND table_name = 'users' AND index_name = 'uq_users_public_id') = 0,
@@ -31,6 +33,8 @@ SET @sql = IF(
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+UPDATE products SET public_id = UUID() WHERE public_id = '';
 
 SET @sql = IF(
   (SELECT COUNT(*) FROM information_schema.statistics
@@ -52,6 +56,8 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+UPDATE orders SET public_id = UUID() WHERE public_id = '';
+
 SET @sql = IF(
   (SELECT COUNT(*) FROM information_schema.statistics
    WHERE table_schema = @db_name AND table_name = 'orders' AND index_name = 'uq_orders_public_id') = 0,
@@ -72,6 +78,8 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+UPDATE order_items SET public_id = UUID() WHERE public_id = '';
+
 SET @sql = IF(
   (SELECT COUNT(*) FROM information_schema.statistics
    WHERE table_schema = @db_name AND table_name = 'order_items' AND index_name = 'uq_order_items_public_id') = 0,
@@ -91,6 +99,8 @@ SET @sql = IF(
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+UPDATE payments SET public_id = UUID() WHERE public_id = '';
 
 SET @sql = IF(
   (SELECT COUNT(*) FROM information_schema.statistics
@@ -121,6 +131,8 @@ SET @sql = IF(
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+UPDATE reviews SET public_id = UUID() WHERE public_id = '';
 
 SET @sql = IF(
   (SELECT COUNT(*) FROM information_schema.statistics
@@ -196,13 +208,6 @@ SET @sql = IF(
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
-
-UPDATE users SET public_id = UUID() WHERE public_id = '';
-UPDATE products SET public_id = UUID() WHERE public_id = '';
-UPDATE orders SET public_id = UUID() WHERE public_id = '';
-UPDATE order_items SET public_id = UUID() WHERE public_id = '';
-UPDATE payments SET public_id = UUID() WHERE public_id = '';
-UPDATE reviews SET public_id = UUID() WHERE public_id = '';
 
 DROP TRIGGER IF EXISTS trg_users_public_id_before_insert;
 DROP TRIGGER IF EXISTS trg_products_public_id_before_insert;
