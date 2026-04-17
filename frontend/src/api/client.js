@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
-    'https://shophub-production-5fee.up.railway.app/api'
+    'https://shophub-backend-api.onrender.com/api'
 });
 
 api.interceptors.request.use((config) => {

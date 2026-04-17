@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useCompare } from '../../context/CompareContext.jsx';
+import { useDemoStore } from '../../context/DemoStoreContext.jsx';
 import { applyProductImageFallback, getProductImage } from '../../utils/images.js';
 import { badgeClassName, getProductBadges } from '../../utils/productMeta.js';
 
 export default function ProductCard({ product }) {
   const [error, setError] = useState('');
   const { compareItems, toggleCompare } = useCompare();
+  const { toggleWishlist, wishlistItems, addToCart } = useDemoStore();
   const isInCompare = compareItems.some((item) => item.id === product.id);
+  const isWishlisted = wishlistItems.some((item) => item.id === product.id);
   const badges = getProductBadges(product);
 
   const handleCompare = (event) => {
@@ -22,12 +25,32 @@ export default function ProductCard({ product }) {
     }
   };
 
+  const handleWishlist = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleWishlist(product);
+  };
+
+  const handleAddToCart = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    addToCart(product, 1);
+  };
+
   return (
     <Link
       to={`/products/${product.id}`}
       className="card group overflow-hidden border border-slate-200/80 transition duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       <div className="relative aspect-square bg-slate-100">
+        <button
+          onClick={handleWishlist}
+          className={`absolute right-3 top-3 z-10 rounded-full px-3 py-2 text-xs font-semibold shadow-sm ${
+            isWishlisted ? 'bg-rose-500 text-white' : 'bg-white/90 text-slate-700'
+          }`}
+        >
+          {isWishlisted ? 'Saved' : 'Wishlist'}
+        </button>
         <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
           {badges.map((badge) => (
             <span
@@ -67,6 +90,9 @@ export default function ProductCard({ product }) {
           className="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-brand-accent hover:text-brand-accent"
         >
           {isInCompare ? 'Remove from Compare' : 'Add to Compare'}
+        </button>
+        <button onClick={handleAddToCart} className="btn-primary w-full text-sm">
+          Add to Cart
         </button>
         {error && <p className="text-xs text-red-600">{error}</p>}
       </div>

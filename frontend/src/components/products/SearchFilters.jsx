@@ -27,13 +27,21 @@ const sortOptions = [
   { value: 'newest', label: 'Newest Arrivals' },
   { value: 'price_asc', label: 'Price: Low to High' },
   { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'rating_desc', label: 'Customer Rating' }
+  { value: 'rating_desc', label: 'Customer Rating' },
+  { value: 'discount_desc', label: 'Biggest Discount' }
 ];
 
 const baseChipClass =
   'rounded-full border px-3 py-2 text-sm font-medium transition';
 
-export default function SearchFilters({ filters, onChange, onQuickChange, onSubmit, onClear }) {
+export default function SearchFilters({
+  filters,
+  onChange,
+  onQuickChange,
+  onSubmit,
+  onClear,
+  filterOptions = {}
+}) {
   const handlePriceRangeSelect = (range) => {
     onQuickChange({
       minPrice: range.minPrice,
@@ -42,7 +50,7 @@ export default function SearchFilters({ filters, onChange, onQuickChange, onSubm
   };
 
   const isActivePriceRange = (range) =>
-    filters.minPrice === range.minPrice && filters.maxPrice === range.maxPrice;
+      filters.minPrice === range.minPrice && filters.maxPrice === range.maxPrice;
 
   return (
     <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-[280px_1fr]">
@@ -117,6 +125,30 @@ export default function SearchFilters({ filters, onChange, onQuickChange, onSubm
             ))}
           </div>
         </div>
+
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-slate-900">Availability</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: '', label: 'All' },
+              { value: 'in_stock', label: 'In Stock' },
+              { value: 'limited', label: 'Limited' }
+            ].map((option) => (
+              <button
+                key={option.value || 'all-availability'}
+                type="button"
+                onClick={() => onQuickChange({ availability: option.value })}
+                className={`${baseChipClass} ${
+                  filters.availability === option.value
+                    ? 'border-brand-accent bg-brand-accent text-white'
+                    : 'border-slate-300 bg-white text-slate-700'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </aside>
 
       <div className="card space-y-4 p-5">
@@ -160,9 +192,57 @@ export default function SearchFilters({ filters, onChange, onQuickChange, onSubm
           />
         </div>
 
-        <p className="text-sm text-slate-500">
-          Search by product name, then refine with category, price range, rating, and sorting.
-        </p>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <select className="input" value={filters.brand} onChange={(event) => onQuickChange({ brand: event.target.value })}>
+            <option value="">All Brands</option>
+            {(filterOptions.brands || []).map((brand) => (
+              <option key={brand} value={brand}>
+                {brand}
+              </option>
+            ))}
+          </select>
+
+          <select className="input" value={filters.color} onChange={(event) => onQuickChange({ color: event.target.value })}>
+            <option value="">All Colors</option>
+            {(filterOptions.colors || []).map((color) => (
+              <option key={color} value={color}>
+                {color}
+              </option>
+            ))}
+          </select>
+
+          <select className="input" value={filters.size} onChange={(event) => onQuickChange({ size: event.target.value })}>
+            <option value="">All Sizes</option>
+            {(filterOptions.sizes || []).map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+
+          <select className="input" value={filters.discountPercent} onChange={(event) => onQuickChange({ discountPercent: event.target.value })}>
+            <option value="">All Discounts</option>
+            {[10, 15, 20, 25, 30].map((value) => (
+              <option key={value} value={value}>
+                {value}% and above
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <select className="input" value={filters.delivery} onChange={(event) => onQuickChange({ delivery: event.target.value })}>
+            <option value="">Any Delivery Window</option>
+            {(filterOptions.deliveryLabels || []).map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+          <p className="rounded-2xl border border-dashed border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Tip: use product name search, then refine with brand, color, size, delivery, and discount filters.
+          </p>
+        </div>
       </div>
     </form>
   );

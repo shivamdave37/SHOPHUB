@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { registerDemoUser } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     setError('');
 
@@ -19,17 +18,19 @@ export default function RegisterPage() {
     }
 
     try {
-      const { data } = await api.post('/auth/register', form);
-      login(data.data);
+      registerDemoUser(form);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.message || 'Registration failed');
     }
   };
 
   return (
     <div className="mx-auto max-w-md card p-6">
       <h1 className="text-3xl font-bold text-slate-900">Create Account</h1>
+      <p className="mt-2 text-sm text-slate-500">
+        Create a demo account to unlock wishlist, order history, student deals, and alerts.
+      </p>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <input
           className="input"

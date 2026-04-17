@@ -6,11 +6,14 @@ import EmptyState from '../components/common/EmptyState.jsx';
 import ProductGrid from '../components/products/ProductGrid.jsx';
 import ProductSkeletonGrid from '../components/products/ProductSkeletonGrid.jsx';
 import SearchFilters from '../components/products/SearchFilters.jsx';
+import { filterAndSortProducts } from '../utils/search.js';
+import { getProductCatalogMeta } from '../utils/productMeta.js';
 
 export default function SearchResultsPage() {
   const [params, setParams] = useSearchParams();
+  const [catalog, setCatalog] = useState([]);
   const [products, setProducts] = useState([]);
-  const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
+  const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1, correctedKeyword: '' });
   const [loading, setLoading] = useState(true);
 
   const filters = useMemo(
@@ -20,7 +23,13 @@ export default function SearchResultsPage() {
       minPrice: params.get('minPrice') || '',
       maxPrice: params.get('maxPrice') || '',
       minRating: params.get('minRating') || '',
-      sort: params.get('sort') || ''
+      sort: params.get('sort') || '',
+      brand: params.get('brand') || '',
+      availability: params.get('availability') || '',
+      color: params.get('color') || '',
+      size: params.get('size') || '',
+      delivery: params.get('delivery') || '',
+      discountPercent: params.get('discountPercent') || ''
     }),
     [params]
   );
@@ -35,14 +44,20 @@ export default function SearchResultsPage() {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const { data } = await api.get('/products/search', { params: Object.fromEntries(params) });
-        setProducts(data.data.products || []);
+        const { data } = await api.get('/products', { params: { limit: 50 } });
+        const allProducts = data.data.products || [];
+        setCatalog(allProducts);
+
+        const filteredProducts = filterAndSortProducts(allProducts, filters);
+        setProducts(filteredProducts);
         setMeta({
-          total: data.data.total || 0,
-          page: data.data.page || 1,
-          totalPages: data.data.totalPages || 1
+          total: filteredProducts.length,
+          page: 1,
+          totalPages: 1,
+          correctedKeyword: filters.keyword && !filteredProducts.length ? '' : filters.keyword
         });
       } catch {
+        setCatalog([]);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -86,10 +101,26 @@ export default function SearchResultsPage() {
       minPrice: '',
       maxPrice: '',
       minRating: '',
-      sort: ''
+      sort: '',
+      brand: '',
+      availability: '',
+      color: '',
+      size: '',
+      delivery: '',
+      discountPercent: ''
     });
     setParams({});
   };
+
+  const filterOptions = useMemo(() => {
+    const values = catalog.map((product) => getProductCatalogMeta(product));
+    return {
+      brands: [...new Set(values.map((item) => item.brand))].sort(),
+      colors: [...new Set(values.map((item) => item.color))].sort(),
+      sizes: [...new Set(values.map((item) => item.size))].sort(),
+      deliveryLabels: [...new Set(values.map((item) => item.deliveryLabel))]
+    };
+  }, [catalog]);
 
   return (
     <div className="space-y-6">
@@ -106,6 +137,7 @@ export default function SearchResultsPage() {
         onQuickChange={handleQuickChange}
         onSubmit={handleSubmit}
         onClear={handleClear}
+        filterOptions={filterOptions}
       />
 
       {loading ? (
@@ -121,7 +153,14 @@ export default function SearchResultsPage() {
           <ProductGrid products={products} />
         </div>
       ) : (
-        <EmptyState title="No matching products" description="Try changing the filters or search term." />
+        <EmptyState
+          title="No matching products"
+          description={
+            filters.keyword
+              ? `We couldn't find a strong match for "${filters.keyword}". Try a shorter name or relax a filter.`
+              : 'Try changing the filters or search term.'
+          }
+        />
       )}
     </div>
   );
