@@ -68,7 +68,7 @@ export default function CartPage() {
 
     const order = placeOrder({ paymentMethod, customerName, addressId: selectedAddressId, couponCode });
     setPlacedMessage(`Order ${order.order_number} placed successfully using ${paymentMethod.toUpperCase()}.`);
-    navigate('/orders');
+    navigate(`/orders?track=${encodeURIComponent(order.id)}`);
   };
 
   if (!cartItems.length) {
