@@ -6,7 +6,7 @@ import EmptyState from '../components/common/EmptyState.jsx';
 import ProductGrid from '../components/products/ProductGrid.jsx';
 import ProductSkeletonGrid from '../components/products/ProductSkeletonGrid.jsx';
 import SearchFilters from '../components/products/SearchFilters.jsx';
-import { filterAndSortProducts } from '../utils/search.js';
+import { filterAndSortProducts, getFallbackSearchResults } from '../utils/search.js';
 import { getProductCatalogMeta } from '../utils/productMeta.js';
 
 export default function SearchResultsPage() {
@@ -49,12 +49,14 @@ export default function SearchResultsPage() {
         setCatalog(allProducts);
 
         const filteredProducts = filterAndSortProducts(allProducts, filters);
-        setProducts(filteredProducts);
+        const displayProducts =
+          filteredProducts.length > 0 ? filteredProducts : getFallbackSearchResults(allProducts, filters);
+        setProducts(displayProducts);
         setMeta({
-          total: filteredProducts.length,
+          total: displayProducts.length,
           page: 1,
           totalPages: 1,
-          correctedKeyword: filters.keyword && !filteredProducts.length ? '' : filters.keyword
+          correctedKeyword: filters.keyword && !filteredProducts.length ? 'closest matches' : filters.keyword
         });
       } catch {
         setCatalog([]);
@@ -150,6 +152,11 @@ export default function SearchResultsPage() {
           <div className="text-sm text-slate-500">
             {meta.total} results found. Page {meta.page} of {meta.totalPages}.
           </div>
+          {meta.correctedKeyword === 'closest matches' && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Exact matches were limited, so we are showing the closest demo products for your search.
+            </div>
+          )}
           <ProductGrid products={products} />
         </div>
       ) : (

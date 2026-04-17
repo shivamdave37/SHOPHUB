@@ -111,6 +111,28 @@ export function filterAndSortProducts(products, filters) {
   return filtered.map(({ product }) => product);
 }
 
+export function getFallbackSearchResults(products, filters) {
+  const keyword = normalizeSearchText(filters.keyword);
+
+  if (!keyword) {
+    return products.slice(0, 8);
+  }
+
+  const relaxed = products
+    .map((product) => ({ product, score: scoreKeyword(product, keyword) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || Number(b.product.rating) - Number(a.product.rating))
+    .map((item) => item.product);
+
+  if (relaxed.length) {
+    return relaxed.slice(0, 8);
+  }
+
+  return [...products]
+    .sort((a, b) => Number(b.rating) - Number(a.rating))
+    .slice(0, 8);
+}
+
 export function getSearchSuggestions(products, keyword, history = []) {
   const normalizedKeyword = normalizeSearchText(keyword);
 

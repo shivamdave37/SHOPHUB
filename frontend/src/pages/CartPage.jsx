@@ -30,6 +30,7 @@ export default function CartPage() {
     postalCode: ''
   });
   const [placedMessage, setPlacedMessage] = useState('');
+  const [checkoutError, setCheckoutError] = useState('');
 
   useEffect(() => {
     if (!selectedAddressId && addresses[0]?.id) {
@@ -45,12 +46,26 @@ export default function CartPage() {
   const grandTotal = Math.max(total >= 1000 ? total - discountAmount : total + 99 - discountAmount, 0);
 
   const handleSaveAddress = () => {
+    if (!addressForm.fullName || !addressForm.line1 || !addressForm.city || !addressForm.state || !addressForm.postalCode) {
+      setCheckoutError('Please complete the full delivery address before saving it.');
+      return;
+    }
+
     const address = addAddress(addressForm);
     setSelectedAddressId(address.id);
     setShowAddressForm(false);
+    setCheckoutError('');
   };
 
   const handlePlaceOrder = () => {
+    setCheckoutError('');
+
+    if (!selectedAddressId) {
+      setShowAddressForm(true);
+      setCheckoutError('Please add and select a delivery address before placing your order.');
+      return;
+    }
+
     const order = placeOrder({ paymentMethod, customerName, addressId: selectedAddressId, couponCode });
     setPlacedMessage(`Order ${order.order_number} placed successfully using ${paymentMethod.toUpperCase()}.`);
     navigate('/orders');
@@ -241,6 +256,7 @@ export default function CartPage() {
         <button onClick={handlePlaceOrder} className="btn-primary w-full">
           Place Order
         </button>
+        {checkoutError && <p className="text-sm text-red-600">{checkoutError}</p>}
         {placedMessage && <p className="text-sm text-green-700">{placedMessage}</p>}
       </div>
     </div>

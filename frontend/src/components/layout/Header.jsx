@@ -10,7 +10,7 @@ export default function Header() {
   const [query, setQuery] = useState('');
   const [catalog, setCatalog] = useState([]);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { compareItems } = useCompare();
   const { cartCount, wishlistCount, unreadNotifications, searchHistory, addSearchEntry } = useDemoStore();
 
@@ -42,6 +42,11 @@ export default function Header() {
     setQuery(value);
     addSearchEntry(value);
     navigate(`/search?keyword=${encodeURIComponent(value)}`);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -113,9 +118,14 @@ export default function Header() {
                 Login
               </Link>
             ) : (
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                Hi, {user.name.split(' ')[0]}
-              </span>
+              <>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  Hi, {user.name.split(' ')[0]}
+                </span>
+                <button onClick={handleLogout} className="hover:text-amber-300">
+                  Logout
+                </button>
+              </>
             )}
             {user?.role === 'admin' && (
               <Link to="/admin/products" className="hover:text-amber-300">

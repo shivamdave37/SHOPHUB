@@ -11,8 +11,26 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [budget, setBudget] = useState('');
+  const [dealEndsAt] = useState(() => Date.now() + 1000 * 60 * 60 * 6);
+  const [timeLeft, setTimeLeft] = useState(1000 * 60 * 60 * 6);
   const { recentlyViewed, wishlistItems } = useDemoStore();
   const { user } = useAuth();
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setTimeLeft(Math.max(dealEndsAt - Date.now(), 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [dealEndsAt]);
+
+  const formatCountdown = () => {
+    const totalSeconds = Math.floor(timeLeft / 1000);
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -97,7 +115,7 @@ export default function HomePage() {
           </div>
           <div className="rounded-2xl bg-amber-400 px-5 py-4 text-slate-900 shadow-lg">
             <p className="text-xs font-semibold uppercase tracking-[0.2em]">Flash Deal</p>
-            <p className="mt-2 text-lg font-bold">Ends in 05:42:19</p>
+            <p className="mt-2 text-lg font-bold">Ends in {formatCountdown()}</p>
             <p className="text-sm">Daily deal refresh with top-rated picks.</p>
           </div>
         </div>
