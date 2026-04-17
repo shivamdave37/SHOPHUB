@@ -31,7 +31,13 @@ export default function HomePage() {
     return (
       <div className="space-y-8">
         <section className="overflow-hidden rounded-3xl bg-gradient-to-r from-brand-navy via-brand-accent to-slate-700 p-8 text-white">
-          <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
+          <div className="flex items-center gap-4">
+            <img src="/shophub-mark.svg" alt="ShopHub mark" className="h-14 w-14 rounded-2xl bg-white/10 p-2" />
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-white/70">Smart Ecommerce Demo</p>
+            </div>
+          </div>
           <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight">
             "Smart shopping starts with strong data."
           </h1>
@@ -64,7 +70,13 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <section className="overflow-hidden rounded-3xl bg-gradient-to-r from-brand-navy via-brand-accent to-slate-700 p-8 text-white">
-        <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
+        <div className="flex items-center gap-4">
+          <img src="/shophub-mark.svg" alt="ShopHub mark" className="h-14 w-14 rounded-2xl bg-white/10 p-2" />
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-white/70">Smart Ecommerce Demo</p>
+          </div>
+        </div>
         <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight">
           "Smart shopping starts with strong data."
         </h1>

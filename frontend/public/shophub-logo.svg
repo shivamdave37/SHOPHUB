@@ -1,0 +1,17 @@
+<svg width="720" height="240" viewBox="0 0 720 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="720" height="240" rx="36" fill="white"/>
+  <g transform="translate(28 28)">
+    <rect x="0" y="8" width="184" height="184" rx="44" fill="#152235"/>
+    <path d="M49 83C49 67.536 61.536 55 77 55H119C134.464 55 147 67.536 147 83V141C147 156.464 134.464 169 119 169H77C61.536 169 49 156.464 49 141V83Z" fill="#F97316"/>
+    <path d="M81 55C81 40.641 92.641 29 107 29C121.359 29 133 40.641 133 55" stroke="#F8FAFC" stroke-width="12" stroke-linecap="round"/>
+    <path d="M121.5 78.5C114.9 74.1 106.7 71.9 98.1 71.9C81.4 71.9 67.3 81.1 67.3 92.8C67.3 102.3 76 109.2 89.6 112.2L108.8 116.4C117.4 118.3 122 121.4 122 126.2C122 132.3 114.4 137 102.2 137C89.4 137 79.2 131.5 72.8 123.3" stroke="#152235" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M154 63L173 52" stroke="#FBBF24" stroke-width="12" stroke-linecap="round"/>
+    <path d="M159 92L181 92" stroke="#FBBF24" stroke-width="12" stroke-linecap="round"/>
+    <path d="M154 121L173 132" stroke="#FBBF24" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(250 62)">
+    <text x="0" y="70" fill="#152235" font-family="Poppins, Montserrat, Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="-1.5">ShopHub</text>
+    <text x="4" y="118" fill="#F97316" font-family="Poppins, Montserrat, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3.6">FAST DEALS. SMART CHOICES.</text>
+    <text x="4" y="160" fill="#64748B" font-family="Poppins, Montserrat, Arial, sans-serif" font-size="24" font-weight="500">A trusted hub for modern shopping</text>
+  </g>
+</svg>

@@ -49,8 +49,13 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-6">
-            <Link to="/" className="text-2xl font-bold tracking-tight text-amber-300">
-              ShopHub
+            <Link to="/" className="flex items-center gap-3 text-2xl font-bold tracking-tight text-amber-300">
+              <img
+                src="/shophub-mark.svg"
+                alt="ShopHub logo"
+                className="h-11 w-11 rounded-2xl bg-white/10 p-1 shadow-sm"
+              />
+              <span>ShopHub</span>
             </Link>
           </div>
 
