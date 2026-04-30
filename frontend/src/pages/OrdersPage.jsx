@@ -1,5 +1,5 @@
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import EmptyState from '../components/common/EmptyState.jsx';
 import { useDemoStore } from '../context/DemoStoreContext.jsx';
 
@@ -29,18 +29,11 @@ function getTrackedOrder(order, now) {
 export default function OrdersPage() {
   const { orders, cancelOrder, reorderOrder } = useDemoStore();
   const [now, setNow] = useState(Date.now());
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [activeOrderId, setActiveOrderId] = useState(searchParams.get('track') || '');
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
-
-  useEffect(() => {
-    const trackedOrderId = searchParams.get('track') || '';
-    setActiveOrderId(trackedOrderId || orders[0]?.id || '');
-  }, [orders, searchParams]);
 
   if (!orders.length) {
     return <EmptyState title="No orders yet" description="Placed orders will appear here." />;
@@ -65,65 +58,14 @@ export default function OrdersPage() {
     URL.revokeObjectURL(url);
   };
 
-  const activeOrder =
-    orders.find((order) => order.id === activeOrderId) ||
-    orders[0];
-
-  const activeTracked = activeOrder ? getTrackedOrder(activeOrder, now) : null;
-
-  const handleTrackOrder = (orderId) => {
-    setActiveOrderId(orderId);
-    setSearchParams({ track: orderId });
-  };
-
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold text-slate-900">Your Orders</h1>
-      {activeOrder && activeTracked && (
-        <div className="card space-y-4 border border-brand-accent/20 bg-gradient-to-r from-white to-amber-50 p-5">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-accent">Track Your Order</p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-900">{activeOrder.order_number}</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Current status: <span className="font-semibold capitalize text-slate-900">{activeTracked.status}</span>
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => handleTrackOrder(activeOrder.id)}
-              className="btn-primary"
-            >
-              Track Order
-            </button>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-6">
-            {activeTracked.timeline.map((item) => (
-              <div key={`active-${item.label}`} className="rounded-2xl border border-slate-200 bg-white p-3">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`h-3 w-3 rounded-full ${
-                      item.done ? 'bg-emerald-500 shadow-[0_0_0_4px_rgba(34,197,94,0.15)]' : 'bg-slate-300'
-                    }`}
-                  />
-                  <p className={`text-sm font-medium ${item.done ? 'text-slate-900' : 'text-slate-400'}`}>{item.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       {orders.map((order) => {
         const tracked = getTrackedOrder(order, now);
 
         return (
-          <div
-            key={order.id}
-            className={`card space-y-5 p-5 ${
-              order.id === activeOrderId ? 'ring-2 ring-brand-accent/30' : ''
-            }`}
-          >
+          <div key={order.id} className="card space-y-5 p-5">
             <div className="grid gap-4 md:grid-cols-5">
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">Order</p>
@@ -184,9 +126,9 @@ export default function OrdersPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button onClick={() => handleTrackOrder(order.id)} className="btn-primary">
+              <Link to={`/orders/${encodeURIComponent(order.id)}/track`} className="btn-primary">
                 Track Order
-              </button>
+              </Link>
               <button onClick={() => reorderOrder(order.id)} className="btn-secondary">
                 Reorder
               </button>

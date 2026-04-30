@@ -6,6 +6,7 @@ import ProductPage from './pages/ProductPage.jsx';
 import SearchResultsPage from './pages/SearchResultsPage.jsx';
 import CartPage from './pages/CartPage.jsx';
 import OrdersPage from './pages/OrdersPage.jsx';
+import OrderTrackingPage from './pages/OrderTrackingPage.jsx';
 import AdminProductsPage from './pages/AdminProductsPage.jsx';
 import ComparePage from './pages/ComparePage.jsx';
 import WishlistPage from './pages/WishlistPage.jsx';
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:orderId/track" element={<OrderTrackingPage />} />
         <Route
           path="/admin/products"
           element={

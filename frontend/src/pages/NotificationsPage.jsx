@@ -20,7 +20,7 @@ export default function NotificationsPage() {
     if (item.kind === 'order') {
       const orderId = getLinkedOrderId(item.message);
       if (orderId) {
-        navigate(`/orders?track=${encodeURIComponent(orderId)}`);
+        navigate(`/orders/${encodeURIComponent(orderId)}/track`);
       }
     }
   };
