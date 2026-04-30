@@ -6,6 +6,7 @@ import EmptyState from '../components/common/EmptyState.jsx';
 import ProductGrid from '../components/products/ProductGrid.jsx';
 import ProductSkeletonGrid from '../components/products/ProductSkeletonGrid.jsx';
 import SearchFilters from '../components/products/SearchFilters.jsx';
+import { getSafeCatalog, saveCatalogCache } from '../utils/catalog.js';
 import { filterAndSortProducts, getFallbackSearchResults } from '../utils/search.js';
 import { getProductCatalogMeta } from '../utils/productMeta.js';
 
@@ -45,7 +46,9 @@ export default function SearchResultsPage() {
       setLoading(true);
       try {
         const { data } = await api.get('/products', { params: { limit: 50 } });
-        const allProducts = data.data.products || [];
+        const liveProducts = data.data.products || [];
+        saveCatalogCache(liveProducts);
+        const allProducts = getSafeCatalog(liveProducts);
         setCatalog(allProducts);
 
         const filteredProducts = filterAndSortProducts(allProducts, filters);
@@ -59,8 +62,19 @@ export default function SearchResultsPage() {
           correctedKeyword: filters.keyword && !filteredProducts.length ? 'closest matches' : filters.keyword
         });
       } catch {
-        setCatalog([]);
-        setProducts([]);
+        const fallbackProducts = getSafeCatalog();
+        const filteredProducts = filterAndSortProducts(fallbackProducts, filters);
+        const displayProducts =
+          filteredProducts.length > 0 ? filteredProducts : getFallbackSearchResults(fallbackProducts, filters);
+
+        setCatalog(fallbackProducts);
+        setProducts(displayProducts);
+        setMeta({
+          total: displayProducts.length,
+          page: 1,
+          totalPages: 1,
+          correctedKeyword: filters.keyword && !filteredProducts.length ? 'closest matches' : filters.keyword
+        });
       } finally {
         setLoading(false);
       }

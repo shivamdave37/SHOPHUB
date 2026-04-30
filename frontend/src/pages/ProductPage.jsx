@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/client.js';
 import { useCompare } from '../context/CompareContext.jsx';
 import { useDemoStore } from '../context/DemoStoreContext.jsx';
+import { getSafeCatalog, getSafeProductById, saveCatalogCache } from '../utils/catalog.js';
 import { applyProductImageFallback, getProductImage } from '../utils/images.js';
 import { badgeClassName, getProductBadges, getProductCatalogMeta } from '../utils/productMeta.js';
 import ProductGrid from '../components/products/ProductGrid.jsx';
@@ -39,8 +40,15 @@ export default function ProductPage() {
           api.get(`/products/${id}`),
           api.get('/products', { params: { limit: 50 } })
         ]);
-        setProduct(data.data);
-        setCatalog(catalogData.data.products || []);
+        const liveCatalog = catalogData.data.products || [];
+        saveCatalogCache(liveCatalog);
+        const safeCatalog = getSafeCatalog(liveCatalog);
+        setCatalog(safeCatalog);
+        setProduct(data.data || getSafeProductById(id, safeCatalog));
+      } catch {
+        const safeCatalog = getSafeCatalog();
+        setCatalog(safeCatalog);
+        setProduct(getSafeProductById(id, safeCatalog));
       } finally {
         setLoading(false);
       }

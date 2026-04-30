@@ -5,6 +5,7 @@ import ProductGrid from '../components/products/ProductGrid.jsx';
 import ProductSkeletonGrid from '../components/products/ProductSkeletonGrid.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useDemoStore } from '../context/DemoStoreContext.jsx';
+import { getSafeCatalog, saveCatalogCache } from '../utils/catalog.js';
 import { filterAndSortProducts } from '../utils/search.js';
 
 export default function HomePage() {
@@ -36,7 +37,11 @@ export default function HomePage() {
     const fetchProducts = async () => {
       try {
         const { data } = await api.get('/products', { params: { limit: 50 } });
-        setProducts(data.data.products);
+        const liveProducts = data.data.products || [];
+        saveCatalogCache(liveProducts);
+        setProducts(getSafeCatalog(liveProducts));
+      } catch {
+        setProducts(getSafeCatalog());
       } finally {
         setLoading(false);
       }
@@ -53,7 +58,6 @@ export default function HomePage() {
             <img src="/shophub-mark.svg" alt="ShopHub mark" className="h-14 w-14 rounded-2xl bg-white/10 p-2" />
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
-              <p className="text-xs uppercase tracking-[0.25em] text-white/70">Smart Ecommerce Demo</p>
             </div>
           </div>
           <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight">
@@ -92,7 +96,6 @@ export default function HomePage() {
           <img src="/shophub-mark.svg" alt="ShopHub mark" className="h-14 w-14 rounded-2xl bg-white/10 p-2" />
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-amber-300">ShopHub</p>
-            <p className="text-xs uppercase tracking-[0.25em] text-white/70">Smart Ecommerce Demo</p>
           </div>
         </div>
         <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight">

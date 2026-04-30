@@ -4,6 +4,7 @@ import api from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useCompare } from '../../context/CompareContext.jsx';
 import { useDemoStore } from '../../context/DemoStoreContext.jsx';
+import { getSafeCatalog, saveCatalogCache } from '../../utils/catalog.js';
 import { getSearchSuggestions } from '../../utils/search.js';
 
 export default function Header() {
@@ -18,9 +19,11 @@ export default function Header() {
     const loadCatalog = async () => {
       try {
         const { data } = await api.get('/products', { params: { limit: 50 } });
-        setCatalog(data.data.products || []);
+        const liveProducts = data.data.products || [];
+        saveCatalogCache(liveProducts);
+        setCatalog(getSafeCatalog(liveProducts));
       } catch {
-        setCatalog([]);
+        setCatalog(getSafeCatalog());
       }
     };
 

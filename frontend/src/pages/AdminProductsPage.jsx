@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client.js';
 import Loader from '../components/common/Loader.jsx';
+import { getSafeCatalog, saveCatalogCache } from '../utils/catalog.js';
 import { getProductCatalogMeta } from '../utils/productMeta.js';
 
 const initialForm = {
@@ -23,7 +24,11 @@ export default function AdminProductsPage() {
   const fetchProducts = async () => {
     try {
       const { data } = await api.get('/products', { params: { limit: 50 } });
-      setProducts(data.data.products);
+      const liveProducts = data.data.products || [];
+      saveCatalogCache(liveProducts);
+      setProducts(getSafeCatalog(liveProducts));
+    } catch {
+      setProducts(getSafeCatalog());
     } finally {
       setLoading(false);
     }
